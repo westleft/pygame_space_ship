@@ -1,9 +1,10 @@
 import pygame
 import random
+import os
 
 FPS = 60
 
-BALCK = (0, 0, 0)
+BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
@@ -15,14 +16,20 @@ pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 
+# 載入圖片
+background_img = pygame.image.load(os.path.join("images","bg.jpg")).convert()
+player_img = pygame.image.load(os.path.join("img","player.png")).convert()
+rock_img = pygame.image.load(os.path.join("img","rock.png")).convert()
+bullet_img = pygame.image.load(os.path.join("img","bullet.png")).convert()
+
 pygame.display.set_caption("肥宅大冒險")
 running = True
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((50, 40))
-        self.image.fill(GREEN)
+        self.image = pygame.transform.scale(player_img, (50, 38))
+        self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.center = (WIDTH/2, HEIGHT/2) 
         self.rect.bottom = HEIGHT - 10
@@ -57,12 +64,11 @@ class Player(pygame.sprite.Sprite):
         all_sprites.add(bullet)
         bullets.add(bullet)
 
-
 class Rock(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((30, 40))
-        self.image.fill(RED)
+        self.image = rock_img
+        self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(0, WIDTH - self.rect.width)
         self.rect.y = random.randrange(-100, -40)
@@ -81,8 +87,8 @@ class Rock(pygame.sprite.Sprite):
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((10, 20))
-        self.image.fill(YELLOW)
+        self.image = bullet_img
+        self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.centerx = x
         self.rect.bottom = y
@@ -133,7 +139,9 @@ while running:
         running = False
 
     # 畫面顯示
-    screen.fill(BALCK) # RGB
+    screen.fill(BLACK) # RGB
+    screen.blit(background_img, (0, 0))
+
     all_sprites.draw(screen)
     pygame.display.update()
 
