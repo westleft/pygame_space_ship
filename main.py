@@ -31,6 +31,7 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(player_img, (50, 38))
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
+        self.radius = 23 
         self.rect.center = (WIDTH/2, HEIGHT/2) 
         self.rect.bottom = HEIGHT - 10
         self.speedx = 8
@@ -70,6 +71,7 @@ class Rock(pygame.sprite.Sprite):
         self.image = rock_img
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
+        self.radius = self.rect.width * 0.85 / 2
         self.rect.x = random.randrange(0, WIDTH - self.rect.width)
         self.rect.y = random.randrange(-100, -40)
         self.speedy = random.randrange(2, 10)
@@ -134,7 +136,7 @@ while running:
         all_sprites.add(r)
         rocks.add(r)
 
-    hits = pygame.sprite.spritecollide(player, rocks, False)
+    hits = pygame.sprite.spritecollide(player, rocks, False, pygame.sprite.collide_circle)
     if hits:
         running = False
 
