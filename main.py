@@ -27,6 +27,15 @@ rock_imgs = []
 for i in range(7):
     rock_imgs.append(pygame.image.load(os.path.join("img",f"rock{i}.png")).convert())
 
+expl_anim = {}
+expl_anim['lg'] = []
+expl_anim['sm'] = []
+for i in range(9):
+    expl_img = pygame.image.load(os.path.join("img",f"expl{i}.png")).convert()
+    expl_img.set_colorkey(BLACK)
+    expl_anim = ['lg'].append(pygame.transform.scale((expl_img), (75, 75)))
+    expl_anim = ['sm'].append(pygame.transform.scale((expl_img), (30, 30)))
+
 # 載入音樂
 shoot_sound = pygame.mixer.Sound(os.path.join("sound","shoot.wav"))
 expl_sound = [
@@ -158,6 +167,33 @@ class Bullet(pygame.sprite.Sprite):
         if self.rect.bottom < 0:
             self.kill()
 
+class Explosion(pygame.sprite.Sprite):
+    def __init__(self, center, size):
+        pygame.sprite.Sprite.__init__(self)
+        self.size = size
+        self.image = expl_anim[self.size][0]
+
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+        self.frame = 0
+        self.last_update = pygame.time.get_ticks()
+        self.frame_rate = 50
+
+    def update(self):
+        now = pygame.time.get_ticks()
+        if now - self.last_update > self.frame_rate:
+            self.frame_rate = now
+            self.frame += 1
+            if self.frame == len(expl_anim[self.size]):
+                self.kill()
+            else:
+                self.image = expl_anim[self.size][self.frame]
+                center = self.rect.center
+                self.rect = self.image.get_rect()
+                self.rect.center = center
+
+
+
 all_sprites = pygame.sprite.Group()
 rocks = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
@@ -191,6 +227,8 @@ while running:
     for hit in hits:
         random.choice(expl_sound).play()
         score += hit.radius
+        expl = Explosion(hit.rect.center, 'lg')
+        all_sprites.add(expl)
         new_rock()
 
     hits = pygame.sprite.spritecollide(player, rocks, True, pygame.sprite.collide_circle)
@@ -200,7 +238,7 @@ while running:
         if player.health <= 0 :
             running = False
 
-    # 畫面顯示
+    # 畫面顯示 
     screen.fill(BLACK) # RGB
     screen.blit(background_img, (0, 0))
 
